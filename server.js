@@ -90,7 +90,20 @@ function verificaValores(valores){
 
 }
 
+//Verificações para Agendamentos
+function verificaIdCarro(id_carro){
+    const carro = carros.find(u => u.id === parseInt(id_carro));
+    if(carro){
+        return
+    }else return {"mensagem": "'id_carro' não corresponde a um cliente cadastrado"}
+};
 
+function verificaIdServico(id_servico){
+    const servico = servicos.find(u => u.id === parseInt(id_servico));
+    if(servico){
+        return
+    }else return {"mensagem": "'id_servico' não corresponde a um cliente cadastrado"}
+};
 
 
 
@@ -225,6 +238,11 @@ app.get('/servicos', (req, res) => {
 app.post('/servicos', (req, res) =>{
     const {descricao, valores, tamanho} = req.body;
     let id = 0;
+
+    if(verificaDescricao(descricao)){
+        return res.status(400).send(verificaDescricao(descricao));
+    } 
+
     servicos.forEach(servico => {
         if (servico.id > id){
             id= servico.id;
@@ -243,6 +261,11 @@ app.put('/servicos/:codigo', (req, res) =>{
     const { codigo } = req.params;
     const { id, descricao, valores } = req.body;
     const servico = servicos.find(u => u.id === parseInt(codigo));
+
+    if(verificaDescricao(descricao)||verificaCodigo(codigo)){
+        return res.status(400).send(verificaDescricao(descricao)||verificaCodigo(codigo));
+    } 
+
     if (servico) {
         servico.id = id;
         servico.descricao = descricao;
@@ -275,6 +298,12 @@ app.get('/agendamentos', (req, res) => {
 app.post('/agendamentos', (req, res) =>{
     const {id_carro, id_servico, data_hora} = req.body;
     let id = 0;
+
+    if(verificaIdServico(id_servico)||verificaIdCarro(id_carro)){
+        return res.status(400).send(verificaIdServico(id_servico)||verificaIdCarro(id_carro));
+    } 
+
+
     //Adiciona Id no agendamento
     // agendamentos.forEach(agendamento => {
     //     if (agendamento.id > id){
@@ -286,53 +315,6 @@ app.post('/agendamentos', (req, res) =>{
     agendamentos.push({id_carro, id_servico, data_hora});
     res.status(201).json({message: 'Agendamento cadastrado com sucesso'})
 });
-
-
-app.post('/users', (req, res) =>{
-    const {name} = req.body;
-    let id = 0;
-    users.forEach(user => {
-        if (user.id > id){
-            id= user.id;
-        }
-    })
-    users.push({ id: id + 1, name});
-    res.status(201).json({message: 'Usuario criado com sucesso!'})
-});
-
-app.get('/users/:id', (req, res) => {
-    const id= Number.parseInt(req.params.id)
-    res.status(200).json(users.find(user => user.id === id));
-});
-
-app.put('/users/:id', (req, res) =>{
-    const { id } = req.params;
-    const { name } = req.body;
-    const user = users.find(u => u.id === parseInt(id));
-    if (user) {
-        user.name = name;
-        res.status(201).json({message:'Usuário atualizado com sucesso!'});
-    } else{
-        res.status(404).json({message:  'Usuário não encontrado'});
-    }
-    
-});
-
-
-app.delete('/users/:id', (req, res) =>{
-    const { id } = req.params;
-    const index = users.findIndex(u => u.id === Number.parseInt(id))
-    if (index !== -1) {
-        users.splice(index, 1);
-        res.status(200).json({message:'Usuário removido com sucesso!'});
-    } else{
-        res.status(404).json({message:  'Usuário não encontrado'});
-    }
-    
-});
-
-
-
 
 app.listen(3000, () => {
     console.log('Api rodando na porta 3000')
