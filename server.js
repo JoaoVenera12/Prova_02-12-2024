@@ -87,7 +87,7 @@ function verificaDescricao(descricao){
         return {"mensagem": "'descricao' deve conter no máximo 100 caracteres"}}
 };
 function verificaValores(valores){
-    if
+
 }
 
 
